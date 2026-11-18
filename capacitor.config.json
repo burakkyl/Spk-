@@ -1,0 +1,18 @@
+{
+  "appId": "com.duzey.lisanslama",
+  "appName": "Düzey",
+  "webDir": "dist",
+  "plugins": {
+    "PrivacyScreen": {
+      "enabled": true,
+      "android": {
+        "preventScreenshots": true,
+        "dimBackground": true,
+        "privacyModeOnActivityHidden": "splash"
+      },
+      "ios": {
+        "blurEffect": "dark"
+      }
+    }
+  }
+}

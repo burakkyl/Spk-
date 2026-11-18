@@ -1,0 +1,80 @@
+name: Android AAB
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['**']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-aab:
+    name: Build Android App Bundle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android 36 platform
+        run: sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Install app dependencies
+        run: npm ci
+
+      - name: Build app and sync Android project
+        env:
+          VITE_RC_ANDROID_API_KEY: ${{ secrets.VITE_RC_ANDROID_API_KEY }}
+          VITE_RC_IOS_API_KEY: ${{ secrets.VITE_RC_IOS_API_KEY }}
+        run: |
+          npm run build
+          npx cap sync android
+
+      - name: Configure optional upload-key signing
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+        run: |
+          if [ -n "$ANDROID_KEYSTORE_BASE64" ]; then
+            test -n "$ANDROID_KEY_ALIAS" && test -n "$ANDROID_KEY_PASSWORD" && test -n "$ANDROID_STORE_PASSWORD" || { echo "Keystore signing secrets are incomplete."; exit 1; }
+            printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$GITHUB_WORKSPACE/android/app/release-upload-key.jks"
+            echo "ANDROID_KEYSTORE_PATH=$GITHUB_WORKSPACE/android/app/release-upload-key.jks" >> "$GITHUB_ENV"
+          else
+            if [ -n "$ANDROID_KEY_ALIAS$ANDROID_KEY_PASSWORD$ANDROID_STORE_PASSWORD" ]; then
+              echo "Remove partial signing secrets or configure the complete keystore set."; exit 1
+            fi
+            echo "No upload key configured; producing an unsigned release AAB for build verification only."
+          fi
+
+      - name: Build AAB
+        working-directory: android
+        run: ./gradlew --no-daemon bundleRelease
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: duzey-android-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+          retention-days: 30
