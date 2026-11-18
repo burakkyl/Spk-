@@ -61,7 +61,7 @@ const PLAN_INFO={
   lifetime:{name:'Ömür boyu',period:'tek seferlik',caption:'Tek seferlik satın alım, yenilenmez'}
 };
 const SUBSCRIPTION_TERMS='Ödeme, satın alma onaylandığında Apple Kimliği veya Google Play hesabınızdan tahsil edilir. Haftalık ve aylık abonelikler, mevcut dönemin bitiminden en az 24 saat önce iptal edilmedikçe aynı süre ve ücretle otomatik olarak yenilenir; yenileme ücreti dönemin bitiminden önceki 24 saat içinde tahsil edilir. Aboneliğinizi App Store / Google Play hesap ayarlarınızdan yönetebilir ve otomatik yenilemeyi kapatabilirsiniz. Ömür boyu plan tek seferlik ödemedir ve yenilenmez.';
-const APP_VERSION='1.0.0';
+const APP_VERSION=typeof __APP_VERSION__!=='undefined'?__APP_VERSION__:'1.0.0';
 const SUPPORT_EMAIL='tburakkayli@gmail.com';
 const LEGAL_TITLES={'gizlilik-politikasi':'Gizlilik Politikası','kullanim-kosullari':'Kullanım Koşulları'};
 const SECONDS_PER_QUESTION=72;

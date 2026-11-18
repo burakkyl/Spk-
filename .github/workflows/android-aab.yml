@@ -1,55 +1,128 @@
+# Android App Bundle (AAB) derleme ve Google Play'e yükleme
+#
+# • Pull request / main'e push → AAB derlenir, Actions artifact olarak saklanır (Play'e yüklenmez).
+# • Actions > "Android AAB" > Run workflow → "Google Play'e yükle" işaretlenirse seçilen kanala yüklenir.
+# • v1.2.3 biçiminde etiket (tag) gönderilirse → derlenir ve otomatik olarak "internal" (iç test) kanalına yüklenir.
+#
+# Gerekli Secrets (Settings > Secrets and variables > Actions):
+#   ANDROID_KEYSTORE_BASE64, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD, ANDROID_STORE_PASSWORD  → yükleme anahtarı (upload key)
+#   PLAY_SERVICE_ACCOUNT_JSON  → Google Play Developer API hizmet hesabı JSON'u (yalnızca yükleme için)
+#   VITE_RC_ANDROID_API_KEY, VITE_RC_IOS_API_KEY  → RevenueCat public SDK anahtarları
+# Ayrıntılar: docs/ANDROID-YAYIN.md
 name: Android AAB
 
 on:
-  workflow_dispatch:
-  push:
-    branches: ['**']
   pull_request:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      upload_to_play:
+        description: "Google Play'e yükle"
+        type: boolean
+        default: false
+      track:
+        description: 'Play kanalı (internal = iç test, alpha = kapalı test, beta = açık test)'
+        type: choice
+        options: [internal, alpha, beta, production]
+        default: internal
+      status:
+        description: 'Sürüm durumu (uygulama henüz hiç yayımlanmadıysa "draft" zorunludur)'
+        type: choice
+        options: [draft, completed]
+        default: draft
+      version_name:
+        description: 'Sürüm adı (boş bırakılırsa package.json sürümü kullanılır)'
+        type: string
+        required: false
+      release_notes:
+        description: 'Sürüm notları (Türkçe, en fazla 500 karakter)'
+        type: string
+        required: false
 
 permissions:
   contents: read
 
-jobs:
-  build-aab:
-    name: Build Android App Bundle
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out source
-        uses: actions/checkout@v4
+concurrency:
+  group: android-aab-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+env:
+  PACKAGE_NAME: com.duzey.lisanslama
+  # Play'in her yüklemede daha büyük versionCode istemesi nedeniyle çalışma numarasına sabit bir taban eklenir.
+  VERSION_CODE_BASE: 100
+
+jobs:
+  build:
+    name: AAB derle
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    outputs:
+      version_code: ${{ steps.version.outputs.code }}
+      version_name: ${{ steps.version.outputs.name }}
+      upload: ${{ steps.version.outputs.upload }}
+    steps:
+      - name: Kaynağı al
+        uses: actions/checkout@v7
+
+      - name: Node.js kur
+        uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
+      - name: Java kur
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 21
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Android SDK kur
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
+          log-accepted-android-sdk-licenses: false
 
-      - name: Install Android 36 platform
-        run: sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+      - name: Gradle kur
+        uses: gradle/actions/setup-gradle@v6
 
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+      - name: Sürüm bilgisini belirle
+        id: version
+        env:
+          INPUT_VERSION_NAME: ${{ inputs.version_name }}
+          IS_UPLOAD: ${{ (github.event_name == 'workflow_dispatch' && inputs.upload_to_play) || startsWith(github.ref, 'refs/tags/v') }}
+        run: |
+          code=$(( VERSION_CODE_BASE + GITHUB_RUN_NUMBER ))
+          if [ -n "$INPUT_VERSION_NAME" ]; then name="$INPUT_VERSION_NAME"
+          elif [[ "$GITHUB_REF" == refs/tags/v* ]]; then name="${GITHUB_REF_NAME#v}"
+          else name=$(node -p "require('./package.json').version"); fi
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "upload=$IS_UPLOAD" >> "$GITHUB_OUTPUT"
+          echo "ANDROID_VERSION_CODE=$code" >> "$GITHUB_ENV"
+          echo "ANDROID_VERSION_NAME=$name" >> "$GITHUB_ENV"
+          echo "APP_VERSION=$name" >> "$GITHUB_ENV"
+          echo "### Sürüm $name (versionCode $code)" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Install app dependencies
+      - name: Bağımlılıkları yükle
         run: npm ci
 
-      - name: Build app and sync Android project
+      - name: Soru bankasını doğrula
+        run: npm test
+
+      - name: Web uygulamasını derle ve Android projesine aktar
         env:
           VITE_RC_ANDROID_API_KEY: ${{ secrets.VITE_RC_ANDROID_API_KEY }}
           VITE_RC_IOS_API_KEY: ${{ secrets.VITE_RC_IOS_API_KEY }}
         run: |
+          if [ "${{ steps.version.outputs.upload }}" = "true" ] && [ -z "$VITE_RC_ANDROID_API_KEY" ]; then
+            echo "::error::Play'e yüklenecek sürüm için VITE_RC_ANDROID_API_KEY secret'ı gerekli (aksi halde satın alma çalışmaz)."; exit 1
+          fi
           npm run build
           npx cap sync android
 
-      - name: Configure optional upload-key signing
+      - name: Yükleme anahtarını (upload key) hazırla
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
@@ -57,24 +130,88 @@ jobs:
           ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
         run: |
           if [ -n "$ANDROID_KEYSTORE_BASE64" ]; then
-            test -n "$ANDROID_KEY_ALIAS" && test -n "$ANDROID_KEY_PASSWORD" && test -n "$ANDROID_STORE_PASSWORD" || { echo "Keystore signing secrets are incomplete."; exit 1; }
-            printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$GITHUB_WORKSPACE/android/app/release-upload-key.jks"
-            echo "ANDROID_KEYSTORE_PATH=$GITHUB_WORKSPACE/android/app/release-upload-key.jks" >> "$GITHUB_ENV"
+            test -n "$ANDROID_KEY_ALIAS" && test -n "$ANDROID_KEY_PASSWORD" && test -n "$ANDROID_STORE_PASSWORD" || { echo "::error::Keystore secret'ları eksik (ALIAS, KEY_PASSWORD, STORE_PASSWORD)."; exit 1; }
+            printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/upload-key.jks"
+            echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/upload-key.jks" >> "$GITHUB_ENV"
+            echo "İmzalı AAB üretilecek." >> "$GITHUB_STEP_SUMMARY"
           else
-            if [ -n "$ANDROID_KEY_ALIAS$ANDROID_KEY_PASSWORD$ANDROID_STORE_PASSWORD" ]; then
-              echo "Remove partial signing secrets or configure the complete keystore set."; exit 1
+            if [ "${{ steps.version.outputs.upload }}" = "true" ]; then
+              echo "::error::Play'e yükleme için imzalama secret'ları gerekli (ANDROID_KEYSTORE_BASE64 vb.). docs/ANDROID-YAYIN.md dosyasına bakın."; exit 1
             fi
-            echo "No upload key configured; producing an unsigned release AAB for build verification only."
+            echo "::warning::İmzalama anahtarı tanımlı değil; imzasız AAB yalnızca derleme kontrolü içindir, Play'e yüklenemez."
+            echo "⚠️ İmzasız AAB (yalnızca derleme kontrolü)." >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      - name: Build AAB
+      - name: AAB derle
         working-directory: android
+        env:
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
         run: ./gradlew --no-daemon bundleRelease
 
-      - name: Upload AAB artifact
-        uses: actions/upload-artifact@v4
+      - name: AAB imzasını kontrol et
+        if: env.ANDROID_KEYSTORE_PATH != ''
+        run: |
+          out=$(jarsigner -verify android/app/build/outputs/bundle/release/app-release.aab 2>&1 || true)
+          echo "$out" | tail -3
+          echo "$out" | grep -q "jar verified" || { echo "::error::AAB imzalanmamış; keystore secret'larını kontrol edin."; exit 1; }
+
+      - name: Anahtar dosyasını sil
+        if: always()
+        run: rm -f "$RUNNER_TEMP/upload-key.jks"
+
+      - name: AAB'yi artifact olarak sakla
+        uses: actions/upload-artifact@v7
         with:
-          name: duzey-android-aab
+          name: duzey-aab-${{ steps.version.outputs.name }}-${{ steps.version.outputs.code }}
           path: android/app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: error
           retention-days: 30
+
+  upload-play:
+    name: Google Play'e yükle
+    needs: build
+    if: needs.build.outputs.upload == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    # Settings > Environments > google-play altında onay zorunluluğu (required reviewers) eklenebilir.
+    environment: google-play
+    steps:
+      - name: AAB'yi indir
+        uses: actions/download-artifact@v8
+        with:
+          name: duzey-aab-${{ needs.build.outputs.version_name }}-${{ needs.build.outputs.version_code }}
+          path: release
+
+      - name: Sürüm notlarını hazırla
+        env:
+          NOTES: ${{ inputs.release_notes }}
+          VERSION_NAME: ${{ needs.build.outputs.version_name }}
+        run: |
+          mkdir -p whatsnew
+          if [ -z "$NOTES" ]; then NOTES="Sürüm $VERSION_NAME: iyileştirmeler ve soru güncellemeleri."; fi
+          printf '%s' "${NOTES:0:500}" > whatsnew/whatsnew-tr-TR
+
+      - name: Secret kontrolü
+        env:
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          test -n "$PLAY_SERVICE_ACCOUNT_JSON" || { echo "::error::PLAY_SERVICE_ACCOUNT_JSON secret'ı tanımlı değil. docs/ANDROID-YAYIN.md dosyasına bakın."; exit 1; }
+
+      - name: Google Play'e yükle
+        uses: r0adkll/upload-google-play@v1.1.5
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: ${{ env.PACKAGE_NAME }}
+          releaseFiles: release/app-release.aab
+          releaseName: ${{ needs.build.outputs.version_name }} (${{ needs.build.outputs.version_code }})
+          track: ${{ inputs.track || 'internal' }}
+          status: ${{ inputs.status || 'draft' }}
+          whatsNewDirectory: whatsnew
+
+      - name: Özet
+        run: |
+          echo "### Google Play'e yüklendi ✅" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Sürüm: ${{ needs.build.outputs.version_name }} (versionCode ${{ needs.build.outputs.version_code }})" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Kanal: ${{ inputs.track || 'internal' }} · Durum: ${{ inputs.status || 'draft' }}" >> "$GITHUB_STEP_SUMMARY"

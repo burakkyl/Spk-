@@ -35,13 +35,11 @@ Uygulama içinde RevenueCat Capacitor SDK kullanılır; mağaza ödemeleri Andro
 
 Plansız veya API anahtarı olmadan ödeme alınmaz. Plan ekranı mağaza ürün fiyatı varsa onu gösterir; web önizlemesindeki TL tutarları taslak referanstır. Satın alma makbuzu doğrulaması RevenueCat’in mağaza bağlantısı üzerinden yapılır. RevenueCat ürün/entitlement kurulumunu bu depodan otomatik yapmak mümkün değildir.
 
-## GitHub Actions ile AAB
+## GitHub Actions ile AAB ve Google Play yüklemesi
 
-`.github/workflows/android-aab.yml`, push/PR veya manuel çalıştırmada Android release AAB üretip 30 gün saklanan Actions artifact’i olarak yükler. `duzey-android-aab` adlı artifact içinden `app-release.aab` indirilebilir.
+`.github/workflows/android-aab.yml` PR ve `main` push'larında imzalı/imzasız AAB üretip artifact olarak saklar. **Actions → Android AAB → Run workflow** ekranında "Google Play'e yükle" seçilirse veya `v*` etiketi gönderilirse AAB doğrudan Google Play'e (varsayılan: iç test, taslak) yüklenir. `versionCode` otomatik artar.
 
-- Keystore Secrets tanımlı değilse **imzasız** release AAB çıkar; bu yalnızca build doğrulaması içindir ve Play Store’a yüklenemez.
-- Play’e yüklenebilir imzalı AAB için Actions Secrets’a `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`, `ANDROID_STORE_PASSWORD` ekleyin. Keystore’u güvenli biçimde oluşturup base64 kodlayın; keystore/parolayı Git’e koymayın.
-- Workflow otomatik olarak Play Store’a yayın yapmaz. İç test, mağaza metinleri, gizlilik beyanları ve imzalı yükleme ayrıca yapılmalıdır.
+Kurulum (keystore, Play hizmet hesabı, secret'lar) ve ilk yükleme adımları: [docs/ANDROID-YAYIN.md](docs/ANDROID-YAYIN.md)
 
 ## Ekran görüntüsü / içerik koruması
 
