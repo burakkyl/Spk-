@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#f8f7f2" />
+  <meta name="theme-color" content="#f6f5f0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Düzey" />
   <meta name="description" content="SPL lisanslama sınavlarına (Düzey 1-2-3) yönelik bağımsız, özgün çalışma denemeleri. SPK veya SPL ile bağlantılı değildir." />
@@ -16,39 +16,39 @@
 <body>
   <div class="app-shell">
     <aside class="sidebar" aria-label="Ana menü">
-      <a class="brand" href="#home" aria-label="Düzey ana sayfa">
-        <span class="brand-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 22.5 13.4 16l4.4 4.4L26 11.8M18.5 11.8H26v7.5" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <span>Düzey<span class="brand-dot">.</span><small>LİSANSLAMA HAZIRLIK</small></span>
-      </a>
-      <div class="nav-caption">MENÜ</div>
+      <button class="brand" data-view="home" aria-label="Düzey ana sayfa">
+        <span class="brand-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 22.5 13.4 16l4.4 4.4L26 11.8M18.5 11.8H26v7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="brand-text">Düzey<span class="brand-dot">.</span><small>LİSANSLAMA HAZIRLIK</small></span>
+      </button>
       <nav class="main-nav">
-        <button class="nav-item active" data-view="home"><span class="nav-icon">⌂</span> Genel bakış</button>
-        <button class="nav-item" data-view="exams"><span class="nav-icon">▤</span> Denemeler <span class="nav-count" id="nav-exam-count"></span></button>
-        <button class="nav-item" data-view="progress"><span class="nav-icon">↗</span> İlerlemem</button>
-        <button class="nav-item" data-view="about"><span class="nav-icon">ⓘ</span> Hakkında</button>
+        <button class="nav-item active" data-view="home"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Ana sayfa</span></button>
+        <button class="nav-item" data-view="exams"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M5 3h10l4 4v14H5zM14 3v5h5M8.5 12.5h7M8.5 16.5h7"/></svg><span>Denemeler</span><span class="nav-count" id="nav-exam-count"></span></button>
+        <button class="nav-item" data-view="progress"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>İlerlemem</span></button>
+        <button class="nav-item" data-view="premium"><svg class="nav-icon" viewBox="0 0 24 24"><path d="m12 3 2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6-4.5-4.2 6.1-.7z"/></svg><span>Düzey Plus</span></button>
+        <button class="nav-item" data-view="about"><svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg><span>Hakkında</span></button>
       </nav>
       <div class="sidebar-bottom">
-        <div class="premium-mini"><div class="crown">✦</div><strong>Bir üst düzeye geç</strong><p>Tüm denemelere sınırsız erişim kazan.</p><button class="mini-link" data-view="premium">Planları incele <span>↗</span></button></div>
-        <div class="profile-row"><div class="avatar">M</div><div><strong>Misafir öğrenci</strong><span>Hesap gerekmez</span></div><span class="more">···</span></div>
+        <div class="premium-mini" id="premium-mini"><div class="crown">✦</div><strong>Tüm denemeleri aç</strong><p>Üç düzeyin tüm denemelerine sınırsız erişim.</p><button class="mini-link" data-view="premium">Planları incele →</button></div>
+        <p class="sidebar-legal">SPK veya SPL ile bağlantılı değildir.</p>
       </div>
     </aside>
 
     <main class="main-content">
       <header class="topbar">
-        <div class="mobile-brand"><span class="brand-mark"><svg viewBox="0 0 32 32"><path d="M7 22.5 13.4 16l4.4 4.4L26 11.8M18.5 11.8H26v7.5" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Düzey<span class="brand-dot">.</span></div>
-        <div class="breadcrumb" id="breadcrumb">Genel bakış <span>/</span> Bugün öğrenmeye devam et</div>
-        <button class="plan-pill" data-view="premium"><span class="sparkle">✦</span> <span id="plan-pill-label">Ücretsiz plan</span> <span class="pill-arrow">↗</span></button>
+        <button class="mobile-brand" data-view="home" aria-label="Ana sayfa"><span class="brand-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 22.5 13.4 16l4.4 4.4L26 11.8M18.5 11.8H26v7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Düzey<span class="brand-dot">.</span></button>
+        <div class="breadcrumb" id="breadcrumb"></div>
+        <button class="plan-pill" data-view="premium"><span class="sparkle">✦</span><span id="plan-pill-label">Ücretsiz plan</span></button>
       </header>
       <div id="view-root"></div>
-      <footer class="footer-note">Düzey bağımsız bir çalışma uygulamasıdır; SPK veya SPL ile bağlantısı yoktur. Sorular özgün çalışma içeriğidir, resmî sınav sorusu değildir. <button class="text-link footer-link" data-view="about">Hakkında ve yasal bilgiler</button> <span>© 2026 Düzey</span></footer>
+      <footer class="footer-note">Düzey bağımsız bir çalışma uygulamasıdır; SPK veya SPL ile bağlantısı yoktur. Sorular özgün çalışma içeriğidir, resmî sınav sorusu değildir. <button class="footer-link" data-view="about">Hakkında ve yasal bilgiler</button></footer>
     </main>
   </div>
   <nav class="mobile-nav" aria-label="Mobil menü">
-    <button class="nav-item active" data-view="home"><span>⌂</span>Özet</button>
-    <button class="nav-item" data-view="exams"><span>▤</span>Denemeler</button>
-    <button class="nav-item" data-view="progress"><span>↗</span>İlerleme</button>
-    <button class="nav-item" data-view="premium"><span>✦</span>Plus</button>
-    <button class="nav-item" data-view="about"><span>ⓘ</span>Hakkında</button>
+    <button class="nav-item active" data-view="home"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Ana sayfa</span></button>
+    <button class="nav-item" data-view="exams"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M5 3h10l4 4v14H5zM14 3v5h5M8.5 12.5h7M8.5 16.5h7"/></svg><span>Denemeler</span></button>
+    <button class="nav-item" data-view="progress"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>İlerleme</span></button>
+    <button class="nav-item" data-view="premium"><svg class="nav-icon" viewBox="0 0 24 24"><path d="m12 3 2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6-4.5-4.2 6.1-.7z"/></svg><span>Plus</span></button>
+    <button class="nav-item" data-view="about"><svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg><span>Hakkında</span></button>
   </nav>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="/spl-curriculum.js"></script>

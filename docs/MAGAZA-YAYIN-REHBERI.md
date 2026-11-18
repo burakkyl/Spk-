@@ -28,7 +28,15 @@ Bu belge, mağaza incelemesinden geçmek için kodda yapılanları ve **mağaza 
 4. **Expert review:** Mevzuat soruları (oranlar, süreler, tebliğ numaraları) yazıldıkları tarihteki metne göre hazırlandı. Yayından önce SPL sertifikalı birine örneklem kontrolü yaptırman önerilir. Hatalı soru bildirimi Hakkında ekranındaki e-postaya geliyor.
 5. **Sürüm:** Her yüklemede Android `versionCode`'u (android/app/build.gradle) ve iOS build numarasını artır.
 
-## 3. App Store Connect
+## 3. Fiyatlar
+
+Uygulamada gösterilen liste fiyatları: **Haftalık 250 TL**, **Aylık 550 TL**, **Ömür boyu 3.000 TL** (`app.js` → `PLAN_PRICES`).
+
+- Mağazadan gerçek fiyat yüklenince her zaman mağaza fiyatı gösterilir; liste fiyatı yalnızca yedektir.
+- App Store Connect ve Google Play Console'da ürün fiyatlarını **aynı tutarlara** ayarla (Apple'da en yakın fiyat basamağını seç). Gösterilen fiyat ile tahsil edilen fiyat farklı olursa uygulama reddedilebilir.
+- Aylık plandaki "~%49 tasarruf" ifadesi 250 TL × 52 / 12 ≈ 1.083 TL'ye göre hesaplandı. Fiyatları değiştirirsen bu metni de güncelle.
+
+## 4. App Store Connect
 
 - **Kategori:** Eğitim. **Yaş derecelendirmesi:** 4+ (tüm sorulara "Hayır").
 - **App Privacy (Uygulama Gizliliği):**
@@ -43,7 +51,7 @@ Bu belge, mağaza incelemesinden geçmek için kodda yapılanları ve **mağaza 
 - **iPad:** Proje iPhone ve iPad'i destekliyor (`TARGETED_DEVICE_FAMILY = 1,2`), bu yüzden **iPad ekran görüntüsü de gerekir** (13"). İstemezsen Xcode'da yalnızca iPhone'u seç.
 - **Ekran görüntüleri:** 6,9" iPhone ekran görüntüleri gerekli. Görüntülerde "resmî", "SPK onaylı" gibi ifadeler kullanma.
 
-## 4. Google Play Console
+## 5. Google Play Console
 
 - **Uygulama içeriği → Gizlilik politikası:** Yukarıdaki URL.
 - **Veri güvenliği (Data Safety):**
@@ -56,7 +64,7 @@ Bu belge, mağaza incelemesinden geçmek için kodda yapılanları ve **mağaza 
 - **Abonelikler:** Ürün kimlikleri RevenueCat'tekilerle aynı olmalı. Google, abonelik ürünlerine *base plan* tanımlanmasını ister.
 - **Kapalı test:** Yeni kişisel geliştirici hesaplarında üretime çıkmadan önce **en az 12 test kullanıcısıyla 14 gün kapalı test** zorunludur.
 
-## 5. Soru bankası
+## 6. Soru bankası
 
 - Kaynaklar `content/` altında. `public/spl-bank.js` dosyası **otomatik üretilir**, elle düzenleme.
 - Yeni soru eklemek için `content/new/*.js` dosyasına `[konu, soru, [4 seçenek], doğruIndeks, açıklama]` biçiminde ekle, ardından `npm run build:bank && npm test` çalıştır.
