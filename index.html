@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f8f7f2" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Düzey" />
+  <meta name="description" content="SPK lisanslama sınavlarına yönelik özgün düzey denemeleri ve konu çalışmaları." />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="question-protection.css" />
+  <title>Düzey — Lisanslama sınavına hazırlan</title>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Ana menü">
+      <a class="brand" href="#home" aria-label="Düzey ana sayfa">
+        <span class="brand-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 22.5 13.4 16l4.4 4.4L26 11.8M18.5 11.8H26v7.5" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span>Düzey<span class="brand-dot">.</span><small>LİSANSLAMA HAZIRLIK</small></span>
+      </a>
+      <div class="nav-caption">MENÜ</div>
+      <nav class="main-nav">
+        <button class="nav-item active" data-view="home"><span class="nav-icon">⌂</span> Genel bakış</button>
+        <button class="nav-item" data-view="exams"><span class="nav-icon">▤</span> Denemeler <span class="nav-count">45</span></button>
+        <button class="nav-item" data-view="progress"><span class="nav-icon">↗</span> İlerlemem</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="premium-mini"><div class="crown">✦</div><strong>Bir üst düzeye geç</strong><p>Tüm denemelere sınırsız erişim kazan.</p><button class="mini-link" data-view="premium">Planları incele <span>↗</span></button></div>
+        <div class="profile-row"><div class="avatar">M</div><div><strong>Misafir öğrenci</strong><span>Hesap gerekmez</span></div><span class="more">···</span></div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="mobile-brand"><span class="brand-mark"><svg viewBox="0 0 32 32"><path d="M7 22.5 13.4 16l4.4 4.4L26 11.8M18.5 11.8H26v7.5" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Düzey<span class="brand-dot">.</span></div>
+        <div class="breadcrumb" id="breadcrumb">Genel bakış <span>/</span> Bugün öğrenmeye devam et</div>
+        <button class="plan-pill" data-view="premium"><span class="sparkle">✦</span> <span id="plan-pill-label">Ücretsiz plan</span> <span class="pill-arrow">↗</span></button>
+      </header>
+      <div id="view-root"></div>
+      <footer class="footer-note">Bu uygulamadaki sorular özgün çalışma içeriğidir; resmi SPK sınav sorusu değildir. <span>© 2026 Düzey</span></footer>
+    </main>
+  </div>
+  <nav class="mobile-nav" aria-label="Mobil menü">
+    <button class="nav-item active" data-view="home"><span>⌂</span>Özet</button>
+    <button class="nav-item" data-view="exams"><span>▤</span>Denemeler</button>
+    <button class="nav-item" data-view="progress"><span>↗</span>İlerleme</button>
+    <button class="nav-item" data-view="premium"><span>✦</span>Premium</button>
+  </nav>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="/spl-curriculum.js"></script>
+  <script src="/spl-legacy.js"></script>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

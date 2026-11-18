@@ -1,0 +1,26 @@
+{
+  "name": "duzey-lisanslama",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "test": "npm run validate:curriculum",
+    "validate:curriculum": "node scripts/validate-curriculum.mjs",
+    "android:sync": "npm run build && cap sync android",
+    "ios:sync": "npm run build && cap sync ios"
+  },
+  "dependencies": {
+    "@capgo/capacitor-privacy-screen": "^8.3.16",
+    "@capacitor/core": "^8.6.2",
+    "@revenuecat/purchases-capacitor": "^14.1.1"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/cli": "^8.6.2",
+    "@capacitor/ios": "^8.6.2",
+    "vite": "^8.3.8"
+  }
+}
