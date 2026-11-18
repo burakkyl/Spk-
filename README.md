@@ -4,7 +4,9 @@
 
 ## İçerik ve erişim
 
-- Toplam **45 deneme / 1.125 özgün soru**; her denemede 25 soru. Düzey 1 ve 3'te 14'er, Düzey 2'de 17 deneme bulunur.
+- **649 benzersiz soru, 63 deneme** (Düzey 1: 13, Düzey 2: 22, Düzey 3: 28). Denemeler `public/spl-bank.js` soru bankasından ders bazında otomatik oluşturulur; sayılar uygulamada otomatik hesaplanır.
+- Soru kaynakları `content/` altındadır; bankayı yeniden üretmek için `npm run build:bank`, doğrulamak için `npm test`.
+- Mağaza yayını kontrol listesi: [docs/MAGAZA-YAYIN-REHBERI.md](docs/MAGAZA-YAYIN-REHBERI.md)
 - Denemeler SPL'nin kullanıcı tarafından paylaşılan konu başlıklarına göre gruplanmıştır: Düzey 1'de 4, Düzey 2'de 9, Düzey 3'te 12 ders başlığı. Her deneme kartında ilgili alt konu kapsamı belirtilir; uygulama yalnızca bu üç lisans düzeyini içerir.
 - Her düzeyin yalnızca ilk denemesi ücretsiz; kalan **42 deneme** Düzey Plus satın alımıyla açılır.
 - Cevap seçimi sonrası doğru/yanlış rengi, açıklama ve sonraki soru akışı bulunur. Cevap seçeneklerinin sırası denemede karıştırılır.

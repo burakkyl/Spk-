@@ -1,5 +1,5 @@
-const CACHE = 'duzey-app-v2';
-const CORE = ['./', './manifest.webmanifest', './icon.svg'];
+const CACHE = 'duzey-app-v4';
+const CORE = ['./', './manifest.webmanifest', './icon.svg', './spl-curriculum.js', './spl-bank.js', './legal/gizlilik-politikasi.html', './legal/kullanim-kosullari.html', './legal/legal.css'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(CORE)));
   self.skipWaiting();

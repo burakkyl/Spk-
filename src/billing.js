@@ -26,6 +26,7 @@ function updateEntitlement(customerInfo) {
   state.premium = Boolean(customerInfo?.entitlements?.active?.[entitlementId]);
   notify();
 }
+let configured = false;
 async function init() {
   state.native = Capacitor.isNativePlatform();
   if (!state.native) return;
@@ -37,7 +38,9 @@ async function init() {
   } catch (error) {
     console.warn('Privacy screen could not be enabled:', error);
   }
-
+  await loadStore();
+}
+async function loadStore() {
   const platform = Capacitor.getPlatform();
   const apiKey = apiKeys[platform];
   if (!apiKey) {
@@ -47,7 +50,12 @@ async function init() {
   }
 
   try {
-    await Purchases.configure({ apiKey, appUserID: null });
+    if (!configured) {
+      await Purchases.configure({ apiKey, appUserID: null });
+      configured = true;
+      Purchases.addCustomerInfoUpdateListener((customerInfo) => updateEntitlement(customerInfo)).catch(() => {});
+    }
+    state.error = '';
     const [offeringsResult, customerResult] = await Promise.all([
       Purchases.getOfferings(),
       Purchases.getCustomerInfo(),
@@ -86,6 +94,7 @@ window.DuzeyBilling = {
     window.dispatchEvent(new CustomEvent('duzey-purchase-complete', { detail: { plan } }));
     return result;
   },
+  reload: () => (state.native ? loadStore() : Promise.resolve()),
   restore: async () => {
     if (!state.ready) throw new Error('Purchases are not configured.');
     const result = await Purchases.restorePurchases();

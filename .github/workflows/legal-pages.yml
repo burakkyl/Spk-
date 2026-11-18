@@ -1,0 +1,40 @@
+# Gizlilik politikası ve kullanım koşullarını GitHub Pages'te yayımlar (mağaza formları herkese açık URL ister).
+# Yalnızca public/legal klasörü yayımlanır; soru bankası yayımlanmaz.
+# İlk kullanımdan önce: GitHub > Settings > Pages > Source = "GitHub Actions".
+name: Legal pages
+on:
+  push:
+    branches: [main]
+    paths: ['public/legal/**', '.github/workflows/legal-pages.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: legal-pages
+  cancel-in-progress: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare site
+        run: |
+          mkdir -p _site
+          cp public/legal/* _site/
+          cat > _site/index.html <<'HTML'
+          <!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Düzey — Yasal</title><link rel="stylesheet" href="legal.css"></head>
+          <body><main><h1>Düzey — Lisanslama Hazırlık</h1><p>SPK veya SPL ile bağlantısı olmayan bağımsız bir çalışma uygulamasıdır.</p>
+          <ul><li><a href="gizlilik-politikasi.html">Gizlilik Politikası</a></li><li><a href="kullanim-kosullari.html">Kullanım Koşulları (EULA)</a></li></ul>
+          <p>Destek: <a href="mailto:tburakkayli@gmail.com">tburakkayli@gmail.com</a></p></main></body></html>
+          HTML
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

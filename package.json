@@ -5,12 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
+    "build": "npm run build:bank && vite build",
     "preview": "vite preview --host 0.0.0.0",
     "test": "npm run validate:curriculum",
     "validate:curriculum": "node scripts/validate-curriculum.mjs",
     "android:sync": "npm run build && cap sync android",
-    "ios:sync": "npm run build && cap sync ios"
+    "ios:sync": "npm run build && cap sync ios",
+    "build:bank": "node scripts/build-bank.mjs"
   },
   "dependencies": {
     "@capgo/capacitor-privacy-screen": "^8.3.16",
