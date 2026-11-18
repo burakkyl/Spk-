@@ -14,7 +14,7 @@ name: Android AAB
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: ['**']
     tags: ['v*']
   workflow_dispatch:
     inputs:

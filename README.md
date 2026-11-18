@@ -37,7 +37,7 @@ Plansız veya API anahtarı olmadan ödeme alınmaz. Plan ekranı mağaza ürün
 
 ## GitHub Actions ile AAB ve Google Play yüklemesi
 
-`.github/workflows/android-aab.yml` PR ve `main` push'larında imzalı/imzasız AAB üretip artifact olarak saklar. **Actions → Android AAB → Run workflow** ekranında "Google Play'e yükle" seçilirse veya `v*` etiketi gönderilirse AAB doğrudan Google Play'e (varsayılan: iç test, taslak) yüklenir. `versionCode` otomatik artar.
+`.github/workflows/android-aab.yml` PR ve push'larda imzalı/imzasız AAB üretip artifact olarak saklar. **Actions → Android AAB → Run workflow** ekranında "Google Play'e yükle" seçilirse veya `v*` etiketi gönderilirse AAB doğrudan Google Play'e (varsayılan: iç test, taslak) yüklenir. `versionCode` otomatik artar.
 
 Kurulum (keystore, Play hizmet hesabı, secret'lar) ve ilk yükleme adımları: [docs/ANDROID-YAYIN.md](docs/ANDROID-YAYIN.md)
 

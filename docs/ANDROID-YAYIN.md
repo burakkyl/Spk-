@@ -4,7 +4,7 @@
 
 | Tetikleyici | Ne olur? |
 |---|---|
-| Pull request, `main`'e push | AAB derlenir ve **Actions → çalışma → Artifacts** altında 30 gün saklanır. Play'e yüklenmez. |
+| Pull request, herhangi bir dala push | AAB derlenir ve **Actions → çalışma → Artifacts** altında 30 gün saklanır. Play'e yüklenmez. |
 | **Actions → Android AAB → Run workflow** | "Google Play'e yükle" işaretlenirse AAB seçilen kanala (internal / alpha / beta / production) yüklenir. |
 | `v1.0.1` gibi bir etiket gönderme | AAB derlenir ve otomatik olarak **internal (iç test)** kanalına *draft* olarak yüklenir. |
 
